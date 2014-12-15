@@ -1,0 +1,29 @@
+{
+	"Replicas" : 
+	[
+		{
+			"Name" : "V-HAMMER-01",
+			"AvailabilityMode" : "AsynchronousCommit",
+			"FailoverMode" : "Manual",
+			"isPrimary" : "false"
+		},
+		{
+			"Name" : "V-HAMMER-02",
+			"AvailabilityMode" : "AsynchronousCommit",
+			"FailoverMode" : "Manual",
+			"isPrimary" : "false"
+		},
+		{
+			"Name" : "V-HAMMER-03",
+			"AvailabilityMode" : "SynchronousCommit",
+			"FailoverMode" : "Automatic",
+			"isPrimary" : "true"
+		},
+		{
+			"Name" : "V-HAMMER-04",
+			"AvailabilityMode" : "SynchronousCommit",
+			"FailoverMode" : "Automatic",
+			"isPrimary" : "false"
+		}
+	]
+}
