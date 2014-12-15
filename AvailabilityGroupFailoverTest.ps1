@@ -71,7 +71,7 @@ Trap {
     };
   }
 
-$totalScriptSteps = 12;
+$totalScriptSteps = 13;
 $currentStep = 0;
 
 #Load dependencies
@@ -183,11 +183,12 @@ $currentStep++;
 Write-Progress -Activity "Failover preparation." -Status "Verifying that data synchronization is complete." -PercentComplete ($currentStep/$totalScriptSteps*100);
 [System.Data.DataRow[]]$synchronizingDatabases = (Get-DatabaseSyncStates -AG $AGname -Server $tempName) | Where-Object {$_.SyncState -like "SYNCHRONIZING"};
 $stopWatch = [System.Diagnostics.Stopwatch]::StartNew()
+$currentStep++;
 while($synchronizingDatabases.Count -gt 0)
 {
     $currentTime = $stopWatch.Elapsed;
     $elapsedTime = [string]::Format("Elapsed time: {0:d2}:{1:d2}:{2:d2}", $CurrentTime.hours, $CurrentTime.minutes, $CurrentTime.seconds)
-    Write-Progress -Activity "Waiting for databases to synchronize." -Status $elapsedTime
+    Write-Progress -Activity "Waiting for databases to synchronize." -Status $elapsedTime -PercentComplete ($currentStep/$totalScriptSteps*100);
     Start-Sleep -s 2;
     $synchronizingDatabases = (Get-DatabaseSyncStates -AG $AGname -Server $tempName) | Where-Object {$_.SyncState -like "SYNCHRONIZING"};
 }    
