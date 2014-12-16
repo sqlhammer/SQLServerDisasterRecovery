@@ -62,14 +62,15 @@ function ValidateTargetReplicaConfiguration()
 
 #Error handling
 $ErrorActionPreference = "Stop";
-Trap {
-  $err = $_.Exception
-  while ( $err.InnerException )
+Trap 
+{
+    $err = $_.Exception
+    while ( $err.InnerException )
     {
-    $err = $err.InnerException
-    write-output $err.Message
+        $err = $err.InnerException
+        write-output $err.Message
     };
-  }
+}
 
 $totalScriptSteps = 13;
 $currentStep = 0;
@@ -97,10 +98,11 @@ elseif (!$jsonString)
 }
 
 #Load JSON
-Write-Progress -Activity "Validating input." -Status "Loading JSON." -PercentComplete (3/$totalScriptSteps*100);
+$currentStep++;
+Write-Progress -Activity "Validating input." -Status "Loading JSON." -PercentComplete ($currentStep/$totalScriptSteps*100);
 $targetConfig = $jsonString | ConvertFrom-Json;
 $currentStep++;
-Write-Progress -Activity "Validating input." -Status "Validating target replica configuration." -PercentComplete (/$totalScriptSteps*100);
+Write-Progress -Activity "Validating input." -Status "Validating target replica configuration." -PercentComplete ($currentStep/$totalScriptSteps*100);
 ValidateTargetReplicaConfiguration;
 
 #Build server object
@@ -113,20 +115,10 @@ if($newPrimaryReplicaName -notcontains "\")
     $newPrimaryReplicaName += "\DEFAULT";
 }
 
-$connStr = "Data Source=$selectedNode;Initial Catalog=master;Integrated Security=SSPI;MultiSubnetFailover=True;";
-$sqlConn = New-Object ("System.Data.SqlClient.SqlConnection") $connStr;
-$svrConn = New-Object ("Microsoft.SqlServer.Management.Common.ServerConnection") $sqlConn;
-$destServer = New-Object ("Microsoft.SqlServer.Management.Smo.Server") $svrConn;
-
 # Test connection
-# Connection is not established when the objects are built.
-# Instead, you need to process a query for a connection to be created.
 # We check the version number as a light weight method of checking the connection.
-$majorSQLVersion = $destServer.Version.Major;
-if($majorSQLVersion -eq $null)
-{
-    throw  "Could not establish connection to $newPrimaryReplicaName."
-}
+# Error handling will abort script if this command fails.
+Invoke-Sqlcmd -ServerInstance $selectedNode -Query "SELECT @@Version;" | Out-Null;
 
 $currentStep++;
 Write-Progress -Activity "Validating input." -Status "Retrieving current Availability Group state." -PercentComplete ($currentStep/$totalScriptSteps*100);
