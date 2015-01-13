@@ -49,6 +49,12 @@ function ValidateTargetReplicaConfiguration()
         throw "The requested configuration exceeds the maximum of three synchronous replicas which can be in an Availability Group configuration.";
     }
 
+    [string[]]$syncReplicas = $targetConfig.Replicas | Where-Object {$_.FailoverMode -like "Automatic"}
+    if($syncReplicas.Count -gt 2)
+    {
+        throw "The requested configuration exceeds the maximum of two automatic fail-over replicas which can be in an Availability Group configuration.";
+    }
+
     if(($targetConfig.Replicas.Count -gt 5) -and ($majorSQLVersion -lt 12))
     {
         throw "The requested configuration exceeds the maximum of five replicas which can be in an Availability Group configuration for a SQL Server version below 12.";
